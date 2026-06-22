@@ -32,13 +32,9 @@ services:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
 
-      # Router
       - traefik.http.routers.searxng.rule=Host(`search.devlooper.co.in`)
-      - traefik.http.routers.searxng.entrypoints=websecure
-      - traefik.http.routers.searxng.tls=true
-      - traefik.http.routers.searxng.tls.certresolver=cloudflare
+      - traefik.http.routers.searxng.entrypoints=web
 
-      # Service
       - traefik.http.services.searxng.loadbalancer.server.port=8080
 
     healthcheck:
