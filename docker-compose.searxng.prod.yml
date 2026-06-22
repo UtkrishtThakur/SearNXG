@@ -1,8 +1,10 @@
 services:
+
   redis:
     image: valkey/valkey:8-alpine
     container_name: searxng-redis
     restart: unless-stopped
+
     networks:
       - internal
 
@@ -11,11 +13,8 @@ services:
     container_name: searxng
     restart: unless-stopped
 
-    env_file:
-      - .env.prod
-
     environment:
-      SEARXNG_BASE_URL: https://search.example.com/
+      SEARXNG_BASE_URL: https://search.devlooper.co.in/
       UWSGI_THREADS: 4
       UWSGI_WORKERS: 4
 
@@ -32,17 +31,24 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public
-      - traefik.http.routers.searxng.rule=Host(`search.example.com`)
-      - traefik.http.routers.searxng.entrypoints=web
+
+      # Router
+      - traefik.http.routers.searxng.rule=Host(`search.devlooper.co.in`)
+      - traefik.http.routers.searxng.entrypoints=websecure
+      - traefik.http.routers.searxng.tls=true
+      - traefik.http.routers.searxng.tls.certresolver=cloudflare
+
+      # Service
       - traefik.http.services.searxng.loadbalancer.server.port=8080
 
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080" ]
       interval: 30s
       timeout: 10s
       retries: 3
 
 networks:
+
   internal:
     external: true
 
